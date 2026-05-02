@@ -3,6 +3,7 @@ import { Suspense, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase/client'
+import { AuthLayout } from '@/components/AuthLayout'
 import type { Rol } from '@/lib/types'
 
 interface Vina {
@@ -60,14 +61,11 @@ function SignupForm() {
       })
       if (errSignup) throw errSignup
 
-      // Si Supabase tiene confirmación de email habilitada, no hay sesión inmediata.
-      // Si no, ya quedó logueado. Forzamos login por las dudas.
       const { error: errLogin } = await sb.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
       })
       if (errLogin) {
-        // Probablemente requiere confirmar email
         router.push('/login?registrado=1')
         return
       }
@@ -85,6 +83,9 @@ function SignupForm() {
     }
   }
 
+  const inputCls =
+    'w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7a1d2b] focus:border-[#7a1d2b]'
+
   return (
     <form onSubmit={enviar} className="space-y-4">
       <div>
@@ -96,7 +97,7 @@ function SignupForm() {
           autoFocus
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className={inputCls}
         />
       </div>
       <div>
@@ -108,7 +109,7 @@ function SignupForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className={inputCls}
         />
       </div>
       <div>
@@ -122,7 +123,7 @@ function SignupForm() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Mínimo 6 caracteres"
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className={inputCls}
         />
       </div>
       <div>
@@ -134,7 +135,7 @@ function SignupForm() {
           onChange={(e) => setEmpresaId(e.target.value)}
           disabled={cargandoVinas}
           required
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className={`${inputCls} bg-white`}
         >
           {cargandoVinas ? (
             <option>Cargando…</option>
@@ -164,7 +165,7 @@ function SignupForm() {
               onClick={() => setRol(k)}
               className={`text-left p-3 rounded-md border text-sm transition ${
                 rol === k
-                  ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500'
+                  ? 'border-[#7a1d2b] bg-[#fdf4f5] ring-1 ring-[#7a1d2b]'
                   : 'border-slate-300 hover:border-slate-400'
               }`}
             >
@@ -182,7 +183,7 @@ function SignupForm() {
       <button
         type="submit"
         disabled={cargando || !email || !password || !nombre || !empresaId}
-        className="w-full bg-brand-600 text-white font-medium rounded-md py-2.5 hover:bg-brand-700 disabled:opacity-50 transition"
+        className="w-full bg-[#7a1d2b] text-white font-medium rounded-md py-2.5 hover:bg-[#5e1a26] disabled:opacity-50 transition"
       >
         {cargando ? 'Creando cuenta…' : 'Crear cuenta'}
       </button>
@@ -190,7 +191,7 @@ function SignupForm() {
         ¿Ya tenés cuenta?{' '}
         <Link
           href="/login"
-          className="text-brand-600 font-medium hover:underline"
+          className="text-[#7a1d2b] font-medium hover:underline"
         >
           Iniciar sesión
         </Link>
@@ -201,20 +202,13 @@ function SignupForm() {
 
 export default function SignupPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-        <div className="mb-6 text-center">
-          <div className="text-2xl font-bold text-brand-600 mb-1">
-            Crear cuenta
-          </div>
-          <p className="text-sm text-slate-500">
-            Plataforma Anexo IX
-          </p>
-        </div>
-        <Suspense fallback={<div className="h-64" />}>
-          <SignupForm />
-        </Suspense>
-      </div>
-    </div>
+    <AuthLayout
+      title="Crear cuenta"
+      subtitle="Registrate para empezar a revisar anexos."
+    >
+      <Suspense fallback={<div className="h-64" />}>
+        <SignupForm />
+      </Suspense>
+    </AuthLayout>
   )
 }

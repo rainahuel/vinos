@@ -16,6 +16,16 @@ const config: Config = {
           700: '#3a47b8',
         },
       },
+      fontFamily: {
+        serif: [
+          'ui-serif',
+          'Georgia',
+          'Cambria',
+          '"Times New Roman"',
+          'Times',
+          'serif',
+        ],
+      },
     },
   },
   plugins: [],

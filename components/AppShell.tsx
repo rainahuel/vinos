@@ -22,9 +22,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', onKey)
   }, [fullscreen, setFullscreen])
 
-  // Páginas públicas (login, callback, error) — sin shell
+  // Páginas públicas — sin shell
   const isPublic =
-    pathname?.startsWith('/login') || pathname?.startsWith('/auth')
+    pathname?.startsWith('/login') ||
+    pathname?.startsWith('/signup') ||
+    pathname?.startsWith('/auth')
   if (isPublic) return <>{children}</>
 
   if (cargando) {

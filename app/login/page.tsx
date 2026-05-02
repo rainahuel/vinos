@@ -3,6 +3,7 @@ import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase/client'
+import { AuthLayout } from '@/components/AuthLayout'
 
 function LoginForm() {
   const router = useRouter()
@@ -50,7 +51,7 @@ function LoginForm() {
           autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7a1d2b] focus:border-[#7a1d2b]"
         />
       </div>
       <div>
@@ -62,7 +63,7 @@ function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#7a1d2b] focus:border-[#7a1d2b]"
         />
       </div>
       {error && (
@@ -73,7 +74,7 @@ function LoginForm() {
       <button
         type="submit"
         disabled={cargando || !email.trim() || !password}
-        className="w-full bg-brand-600 text-white font-medium rounded-md py-2.5 hover:bg-brand-700 disabled:opacity-50 transition"
+        className="w-full bg-[#7a1d2b] text-white font-medium rounded-md py-2.5 hover:bg-[#5e1a26] disabled:opacity-50 transition"
       >
         {cargando ? 'Entrando…' : 'Entrar'}
       </button>
@@ -81,7 +82,7 @@ function LoginForm() {
         ¿Sos nuevo?{' '}
         <Link
           href={`/signup${next !== '/' ? `?next=${encodeURIComponent(next)}` : ''}`}
-          className="text-brand-600 font-medium hover:underline"
+          className="text-[#7a1d2b] font-medium hover:underline"
         >
           Crear cuenta
         </Link>
@@ -92,20 +93,10 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
-        <div className="mb-6 text-center">
-          <div className="text-2xl font-bold text-brand-600 mb-1">
-            Anexo IX
-          </div>
-          <p className="text-sm text-slate-500">
-            Plataforma de revisión colaborativa
-          </p>
-        </div>
-        <Suspense fallback={<div className="h-32" />}>
-          <LoginForm />
-        </Suspense>
-      </div>
-    </div>
+    <AuthLayout title="Iniciar sesión" subtitle="Accedé con tu correo y contraseña.">
+      <Suspense fallback={<div className="h-32" />}>
+        <LoginForm />
+      </Suspense>
+    </AuthLayout>
   )
 }
