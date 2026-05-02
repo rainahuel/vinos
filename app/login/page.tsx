@@ -1,13 +1,15 @@
 'use client'
 import { Suspense, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { getSupabase } from '@/lib/supabase/client'
 
 function LoginForm() {
+  const router = useRouter()
   const params = useSearchParams()
   const next = params.get('next') ?? '/'
   const [email, setEmail] = useState('')
-  const [enviado, setEnviado] = useState(false)
+  const [password, setPassword] = useState('')
   const [cargando, setCargando] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -17,52 +19,30 @@ function LoginForm() {
     setError(null)
     try {
       const sb = getSupabase()
-      const origin = window.location.origin
-      const { error: err } = await sb.auth.signInWithOtp({
+      const { error: err } = await sb.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
-        options: {
-          emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}`,
-          shouldCreateUser: true,
-        },
+        password,
       })
       if (err) throw err
-      setEnviado(true)
+      router.push(next)
+      router.refresh()
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Error al enviar el link'
-      setError(msg)
+      const msg = e instanceof Error ? e.message : 'Error al iniciar sesión'
+      setError(
+        msg.toLowerCase().includes('invalid')
+          ? 'Correo o contraseña incorrectos'
+          : msg,
+      )
     } finally {
       setCargando(false)
     }
-  }
-
-  if (enviado) {
-    return (
-      <div className="text-center py-6">
-        <div className="text-4xl mb-3">📩</div>
-        <h2 className="font-semibold text-slate-900 mb-2">
-          Revisá tu correo
-        </h2>
-        <p className="text-sm text-slate-600">
-          Te mandamos un link a <strong>{email}</strong>. Cliquealo para entrar.
-        </p>
-        <button
-          onClick={() => {
-            setEnviado(false)
-            setEmail('')
-          }}
-          className="mt-6 text-xs text-slate-500 hover:text-slate-700 underline"
-        >
-          Usar otro email
-        </button>
-      </div>
-    )
   }
 
   return (
     <form onSubmit={enviar} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">
-          Correo electrónico
+          Correo
         </label>
         <input
           type="email"
@@ -70,7 +50,18 @@ function LoginForm() {
           autoFocus
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="vos@empresa.com"
+          className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+        />
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">
+          Contraseña
+        </label>
+        <input
+          type="password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           className="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
         />
       </div>
@@ -81,13 +72,19 @@ function LoginForm() {
       )}
       <button
         type="submit"
-        disabled={cargando || !email.trim()}
+        disabled={cargando || !email.trim() || !password}
         className="w-full bg-brand-600 text-white font-medium rounded-md py-2.5 hover:bg-brand-700 disabled:opacity-50 transition"
       >
-        {cargando ? 'Enviando…' : 'Enviar link de acceso'}
+        {cargando ? 'Entrando…' : 'Entrar'}
       </button>
-      <p className="text-xs text-slate-400 text-center">
-        Te enviaremos un link único por email. Sin contraseñas.
+      <p className="text-sm text-center text-slate-500">
+        ¿Sos nuevo?{' '}
+        <Link
+          href={`/signup${next !== '/' ? `?next=${encodeURIComponent(next)}` : ''}`}
+          className="text-brand-600 font-medium hover:underline"
+        >
+          Crear cuenta
+        </Link>
       </p>
     </form>
   )
