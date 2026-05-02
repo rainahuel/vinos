@@ -40,8 +40,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Archivos</h2>
           <p className="text-sm text-slate-500 mt-1">

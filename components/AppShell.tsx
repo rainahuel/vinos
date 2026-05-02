@@ -8,6 +8,7 @@ import { useUI } from '@/lib/uiStore'
 export function AppShell({ children }: { children: React.ReactNode }) {
   const fullscreen = useUI((s) => s.fullscreen)
   const setFullscreen = useUI((s) => s.setFullscreen)
+  const toggleSidebar = useUI((s) => s.toggleSidebar)
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -30,11 +31,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen">
       <SupabaseSync />
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="h-14 border-b bg-white px-6 flex items-center justify-between">
-          <h1 className="text-sm font-semibold text-slate-700">
-            Plataforma Anexo IX
-          </h1>
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <header className="h-14 border-b bg-white px-3 sm:px-6 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={toggleSidebar}
+              className="p-2 rounded-md hover:bg-slate-100 text-slate-600"
+              aria-label="Abrir/cerrar menú"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </svg>
+            </button>
+            <h1 className="text-sm font-semibold text-slate-700 truncate">
+              <span className="hidden sm:inline">Plataforma </span>Anexo IX
+            </h1>
+          </div>
           <RolSwitcher />
         </header>
         <main className="flex-1 overflow-auto">{children}</main>

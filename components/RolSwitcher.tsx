@@ -20,28 +20,30 @@ export function RolSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-2 text-xs">
-      <span className="text-slate-500">Ver como:</span>
+    <div className="flex items-center gap-2 text-xs shrink-0">
+      <span className="hidden md:inline text-slate-500">Ver como:</span>
       <div className="inline-flex rounded-md border bg-slate-50 p-0.5">
         <button
           onClick={() => cambiar('ejecutivo')}
-          className={`px-3 py-1 rounded ${
+          className={`px-2 sm:px-3 py-1 rounded ${
             usuario.rol === 'ejecutivo'
               ? 'bg-white shadow-sm font-medium text-brand-700'
               : 'text-slate-500'
           }`}
         >
-          Ejecutivo
+          <span className="sm:hidden">💼</span>
+          <span className="hidden sm:inline">Ejecutivo</span>
         </button>
         <button
           onClick={() => cambiar('laboratorio')}
-          className={`px-3 py-1 rounded ${
+          className={`px-2 sm:px-3 py-1 rounded ${
             usuario.rol === 'laboratorio'
               ? 'bg-white shadow-sm font-medium text-brand-700'
               : 'text-slate-500'
           }`}
         >
-          Laboratorio
+          <span className="sm:hidden">🧪</span>
+          <span className="hidden sm:inline">Laboratorio</span>
         </button>
       </div>
     </div>

@@ -17,7 +17,7 @@ export default function AprobadosPage() {
     )
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Archivos aprobados</h2>
         <p className="text-sm text-slate-500 mt-1">

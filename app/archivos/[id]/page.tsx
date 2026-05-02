@@ -99,8 +99,8 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="border-b bg-white px-6 pt-4">
-        <div className="flex items-center justify-between mb-3 gap-4">
+      <div className="border-b bg-white px-3 sm:px-6 pt-3 sm:pt-4">
+        <div className="flex items-start sm:items-center justify-between mb-3 gap-3 flex-wrap">
           <div className="min-w-0">
             {!fullscreen && (
               <Link
@@ -217,7 +217,7 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
                 key={h.nombre}
                 onClick={() => setHojaActiva(h.nombre)}
                 className={clsx(
-                  'px-4 py-2 text-sm border-b-2 whitespace-nowrap transition flex items-center gap-2',
+                  'px-3 sm:px-4 py-2 text-xs sm:text-sm border-b-2 whitespace-nowrap transition flex items-center gap-1.5 sm:gap-2',
                   isActiva
                     ? pendientesHoja > 0
                       ? 'border-rose-500 text-rose-700 font-medium bg-rose-50'
@@ -253,20 +253,20 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <div className="border-b bg-white px-6 py-3 flex items-center gap-4">
-        <div className="inline-flex rounded-md border bg-slate-50 p-0.5 text-xs">
+      <div className="border-b bg-white px-3 sm:px-6 py-3 flex flex-wrap items-center gap-2 sm:gap-4">
+        <div className="inline-flex rounded-md border bg-slate-50 p-0.5 text-xs overflow-x-auto max-w-full">
           {(
             [
               ['todas', `Todas (${conteos.total})`],
               ['pendiente', `Pendientes (${conteos.pendiente})`],
               ['resuelto', `Resueltas (${conteos.resuelto})`],
-              ['ok', `Sin observación (${conteos.ok})`],
+              ['ok', `Sin obs. (${conteos.ok})`],
             ] as [Filtro, string][]
           ).map(([k, label]) => (
             <button
               key={k}
               onClick={() => setFiltro(k)}
-              className={`px-3 py-1 rounded ${
+              className={`px-2 sm:px-3 py-1 rounded whitespace-nowrap ${
                 filtro === k
                   ? 'bg-white shadow-sm font-medium text-brand-700'
                   : 'text-slate-500'
@@ -279,20 +279,36 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
         <input
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          placeholder="Buscar en filas…"
-          className="text-sm border rounded-md px-3 py-1.5 w-64 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          placeholder="Buscar…"
+          className="text-sm border rounded-md px-3 py-1.5 flex-1 min-w-[140px] sm:max-w-xs focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_400px] overflow-hidden">
-        <div className="min-w-0 bg-white border-r overflow-hidden">
+      <div className="flex-1 lg:grid lg:grid-cols-[1fr_400px] overflow-hidden relative">
+        <div className="min-w-0 bg-white lg:border-r overflow-hidden h-full">
           <TablaAnexo
             solicitudes={filtradas}
             seleccionadaId={seleccionadaId}
             onSeleccionar={setSeleccionadaId}
           />
         </div>
-        <div className="overflow-hidden">
+        <div
+          className={clsx(
+            'overflow-hidden bg-white',
+            'fixed lg:static inset-0 z-40 lg:z-auto',
+            'transition-transform duration-200',
+            seleccionada ? 'translate-x-0' : 'translate-x-full lg:translate-x-0',
+          )}
+        >
+          {seleccionada && (
+            <button
+              onClick={() => setSeleccionadaId(null)}
+              className="lg:hidden absolute top-3 right-3 z-10 p-2 rounded-md bg-white border shadow-sm text-slate-600 hover:bg-slate-50"
+              aria-label="Cerrar comentarios"
+            >
+              ✕
+            </button>
+          )}
           <PanelComentarios solicitud={seleccionada} />
         </div>
       </div>
