@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+::-webkit-scrollbar {
+  @apply w-2 h-3;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
+}
+::-webkit-scrollbar-track {
+  @apply bg-slate-100;
+}
+
+.scroll-x-fat::-webkit-scrollbar {
+  height: 14px;
+}
+.scroll-x-fat::-webkit-scrollbar-thumb {
+  @apply bg-slate-400 rounded;
+}
+.scroll-x-fat::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-500;
+}
+.scroll-x-fat::-webkit-scrollbar-track {
+  @apply bg-slate-200;
+}

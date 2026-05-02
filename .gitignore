@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+.DS_Store
+*.log
+.env*.local
+.vercel
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Datos reales del cliente — no subir
+*.xlsx
+*.xls
