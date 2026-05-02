@@ -2,17 +2,18 @@
 import { useEffect } from 'react'
 import { getSupabase } from '@/lib/supabase/client'
 import { useStore } from '@/lib/store'
+import { useUsuarioActual } from '@/lib/useUsuarioActual'
 import {
   archivoFromRow,
   comentarioFromRow,
   solicitudFromRow,
-  EMPRESA_DEMO_ID,
   type ArchivoRow,
   type ComentarioRow,
   type SolicitudRow,
 } from '@/lib/supabase/mappers'
 
 export function SupabaseSync() {
+  const { usuario } = useUsuarioActual()
   const cargarTodo = useStore((s) => s.cargarTodo)
   const upsertArchivo = useStore((s) => s.upsertArchivoLocal)
   const removerArchivo = useStore((s) => s.removerArchivoLocal)
@@ -20,20 +21,22 @@ export function SupabaseSync() {
   const upsertComentario = useStore((s) => s.upsertComentarioLocal)
 
   useEffect(() => {
+    if (!usuario) return
     cargarTodo().catch((e) => console.error('cargarTodo', e))
-  }, [cargarTodo])
+  }, [usuario, cargarTodo])
 
   useEffect(() => {
+    if (!usuario) return
     const sb = getSupabase()
     const channel = sb
-      .channel('anexo-saas-realtime')
+      .channel(`anexo-${usuario.empresaId}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
           table: 'archivos',
-          filter: `empresa_id=eq.${EMPRESA_DEMO_ID}`,
+          filter: `empresa_id=eq.${usuario.empresaId}`,
         },
         (payload) => {
           if (payload.eventType === 'DELETE') {
@@ -49,7 +52,7 @@ export function SupabaseSync() {
           event: '*',
           schema: 'public',
           table: 'solicitudes',
-          filter: `empresa_id=eq.${EMPRESA_DEMO_ID}`,
+          filter: `empresa_id=eq.${usuario.empresaId}`,
         },
         (payload) => {
           if (payload.eventType !== 'DELETE') {
@@ -63,7 +66,7 @@ export function SupabaseSync() {
           event: 'INSERT',
           schema: 'public',
           table: 'comentarios',
-          filter: `empresa_id=eq.${EMPRESA_DEMO_ID}`,
+          filter: `empresa_id=eq.${usuario.empresaId}`,
         },
         (payload) => {
           upsertComentario(comentarioFromRow(payload.new as ComentarioRow))
@@ -74,7 +77,7 @@ export function SupabaseSync() {
     return () => {
       sb.removeChannel(channel)
     }
-  }, [upsertArchivo, removerArchivo, upsertSolicitud, upsertComentario])
+  }, [usuario, upsertArchivo, removerArchivo, upsertSolicitud, upsertComentario])
 
   return null
 }

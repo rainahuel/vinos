@@ -1,14 +1,18 @@
 'use client'
 import { useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
-import { RolSwitcher } from './RolSwitcher'
+import { UserMenu } from './UserMenu'
 import { SupabaseSync } from './SupabaseSync'
 import { useUI } from '@/lib/uiStore'
+import { useUsuarioActual } from '@/lib/useUsuarioActual'
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
   const fullscreen = useUI((s) => s.fullscreen)
   const setFullscreen = useUI((s) => s.setFullscreen)
   const toggleSidebar = useUI((s) => s.toggleSidebar)
+  const { usuario, cargando, sinAcceso } = useUsuarioActual()
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -17,6 +21,35 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [fullscreen, setFullscreen])
+
+  // Páginas públicas (login, callback, error) — sin shell
+  const isPublic =
+    pathname?.startsWith('/login') || pathname?.startsWith('/auth')
+  if (isPublic) return <>{children}</>
+
+  if (cargando) {
+    return (
+      <div className="h-screen flex items-center justify-center text-slate-400 text-sm">
+        Cargando…
+      </div>
+    )
+  }
+
+  if (sinAcceso || !usuario) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white border rounded-2xl shadow-sm p-8 text-center">
+          <div className="text-4xl mb-3">🚫</div>
+          <h1 className="font-semibold text-slate-900 mb-2">Sin acceso</h1>
+          <p className="text-sm text-slate-600 mb-4">
+            Tu correo no tiene permisos para esta empresa. Pedile a un
+            administrador que te invite.
+          </p>
+          <UserMenu />
+        </div>
+      </div>
+    )
+  }
 
   if (fullscreen) {
     return (
@@ -59,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="hidden sm:inline">Plataforma </span>Anexo IX
             </h1>
           </div>
-          <RolSwitcher />
+          <UserMenu />
         </header>
         <main className="flex-1 overflow-auto">{children}</main>
       </div>

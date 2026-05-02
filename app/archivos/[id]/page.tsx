@@ -6,7 +6,7 @@ import { useStore } from '@/lib/store'
 import { useUI } from '@/lib/uiStore'
 import { TablaAnexo } from '@/components/TablaAnexo'
 import { PanelComentarios } from '@/components/PanelComentarios'
-import { RolSwitcher } from '@/components/RolSwitcher'
+import { UserMenu } from '@/components/UserMenu'
 import { exportarConObservaciones } from '@/lib/excel'
 import {
   estadoArchivo,
@@ -22,7 +22,9 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
   const todasSolicitudes = useStore((s) => s.solicitudes)
   const todas = todasSolicitudes.filter((x) => x.archivoId === params.id)
   const comentarios = useStore((s) => s.comentarios)
+  const usuario = useStore((s) => s.usuario)
   const toggleAprobado = useStore((s) => s.toggleAprobado)
+  const puedeEscribir = usuario.rol === 'admin' || usuario.rol === 'ejecutivo'
   const fullscreen = useUI((s) => s.fullscreen)
   const toggleFullscreen = useUI((s) => s.toggleFullscreen)
   const setFullscreen = useUI((s) => s.setFullscreen)
@@ -143,7 +145,7 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            {fullscreen && <RolSwitcher />}
+            {fullscreen && <UserMenu />}
             <button
               onClick={toggleFullscreen}
               title={fullscreen ? 'Salir (Esc)' : 'Pantalla completa'}
@@ -166,31 +168,33 @@ export default function ArchivoPage({ params }: { params: { id: string } }) {
             </button>
             {!fullscreen && (
               <>
-                <button
-                  onClick={() => {
-                    const pendientes = todas.filter(
-                      (s) => s.estado === 'pendiente',
-                    ).length
-                    if (
-                      !archivo.aprobado &&
-                      pendientes > 0 &&
-                      !confirm(
-                        `Hay ${pendientes} fila(s) pendiente(s). ¿Aprobar igual?`,
-                      )
-                    ) {
-                      return
-                    }
-                    toggleAprobado(archivo.id)
-                  }}
-                  className={clsx(
-                    'px-4 py-2 rounded-md text-sm font-medium',
-                    archivo.aprobado
-                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700',
-                  )}
-                >
-                  {archivo.aprobado ? '↩ Reabrir' : '✓ Aprobar archivo'}
-                </button>
+                {puedeEscribir && (
+                  <button
+                    onClick={() => {
+                      const pendientes = todas.filter(
+                        (s) => s.estado === 'pendiente',
+                      ).length
+                      if (
+                        !archivo.aprobado &&
+                        pendientes > 0 &&
+                        !confirm(
+                          `Hay ${pendientes} fila(s) pendiente(s). ¿Aprobar igual?`,
+                        )
+                      ) {
+                        return
+                      }
+                      toggleAprobado(archivo.id)
+                    }}
+                    className={clsx(
+                      'px-4 py-2 rounded-md text-sm font-medium',
+                      archivo.aprobado
+                        ? 'bg-amber-100 text-amber-700 hover:bg-amber-200'
+                        : 'bg-emerald-600 text-white hover:bg-emerald-700',
+                    )}
+                  >
+                    {archivo.aprobado ? '↩ Reabrir' : '✓ Aprobar archivo'}
+                  </button>
+                )}
                 <button
                   onClick={exportar}
                   className="px-4 py-2 rounded-md border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50"

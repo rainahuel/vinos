@@ -15,10 +15,12 @@ type Tab = 'en_revision' | 'aprobado'
 export default function HomePage() {
   const archivos = useStore((s) => s.archivos)
   const solicitudes = useStore((s) => s.solicitudes)
+  const usuario = useStore((s) => s.usuario)
   const eliminarArchivo = useStore((s) => s.eliminarArchivo)
   const [tab, setTab] = useState<Tab>('en_revision')
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
+  const puedeEscribir = usuario.rol === 'admin' || usuario.rol === 'ejecutivo'
 
   if (!mounted) return null
 
@@ -48,7 +50,7 @@ export default function HomePage() {
             Subí un Anexo IX para empezar la revisión colaborativa.
           </p>
         </div>
-        <UploadButton />
+        {puedeEscribir && <UploadButton />}
       </div>
 
       <div className="inline-flex rounded-md border bg-slate-50 p-0.5 text-sm mb-4">
@@ -147,17 +149,21 @@ export default function HomePage() {
                   >
                     Abrir →
                   </Link>
-                  <button
-                    onClick={() => {
-                      if (confirm('¿Eliminar este archivo y sus comentarios?')) {
-                        eliminarArchivo(a.id)
-                      }
-                    }}
-                    className="text-sm text-slate-400 hover:text-red-600 px-2"
-                    title="Eliminar"
-                  >
-                    🗑
-                  </button>
+                  {puedeEscribir && (
+                    <button
+                      onClick={() => {
+                        if (
+                          confirm('¿Eliminar este archivo y sus comentarios?')
+                        ) {
+                          eliminarArchivo(a.id)
+                        }
+                      }}
+                      className="text-sm text-slate-400 hover:text-red-600 px-2"
+                      title="Eliminar"
+                    >
+                      🗑
+                    </button>
+                  )}
                 </div>
               </div>
             )
